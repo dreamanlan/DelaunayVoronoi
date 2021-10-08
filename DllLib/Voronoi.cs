@@ -4,19 +4,18 @@ namespace DelaunayVoronoi
 {
     public class Voronoi
     {
-        public IEnumerable<Edge> GenerateEdgesFromDelaunay(IEnumerable<Triangle> triangulation)
+        public bool GenerateEdgesFromDelaunay(HashSet<Triangle> triangulation, HashSet<Edge> voronoiEdges)
         {
-            var voronoiEdges = new HashSet<Edge>();
             foreach (var triangle in triangulation)
             {
                 foreach (var neighbor in triangle.TrianglesWithSharedEdge)
                 {
-                    var edge = new Edge(triangle.Circumcenter, neighbor.Circumcenter);
+                    var edge = Edge.New(triangle.Circumcenter, neighbor.Circumcenter);
                     voronoiEdges.Add(edge);
                 }
             }
 
-            return voronoiEdges;
+            return voronoiEdges.Count > 0;
         }
     }
 }

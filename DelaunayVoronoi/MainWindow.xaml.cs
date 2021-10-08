@@ -35,20 +35,43 @@ namespace DelaunayVoronoi
 
         }
 
+        private List<Point> GeneratePoints(int amount, double maxX, double maxY)
+        {
+            // TODO make more beautiful
+            var point0 = Point.New(0, 0);
+            var point1 = Point.New(0, maxY);
+            var point2 = Point.New(maxX, maxY);
+            var point3 = Point.New(maxX, 0);
+            var points = new List<Point>();// { point0, point1, point2, point3 };
+
+            var random = new Random();
+            for (int i = 0; i < amount; i++) {
+                var pointX = random.NextDouble() * maxX;
+                var pointY = random.NextDouble() * maxY;
+                points.Add(Point.New(pointX, pointY));
+            }
+
+            return points;
+        }
+
         private void GenerateAndDraw()
         {
             Canvas.Children.Clear();
             Canvas.ClipToBounds = true;
-            var points = delaunay.GeneratePoints(PointCount, DiagramWidth, DiagramHeight);
+            var points = GeneratePoints(PointCount, DiagramWidth, DiagramHeight);
 
             var delaunayTimer = Stopwatch.StartNew();
-            var triangulation = delaunay.BowyerWatson(points);
+            var triangulation = new HashSet<Triangle>();
+            delaunay.BowyerWatson(points, triangulation);
             delaunayTimer.Stop();
+            Console.WriteLine($"delaunay:{delaunayTimer.ElapsedTicks * 1000000 / Stopwatch.Frequency}us {delaunayTimer.ElapsedMilliseconds}ms");
             DrawTriangulation(triangulation);
 
             var voronoiTimer = Stopwatch.StartNew();
-            var vornoiEdges = voronoi.GenerateEdgesFromDelaunay(triangulation);
+            var vornoiEdges = new HashSet<Edge>();
+            voronoi.GenerateEdgesFromDelaunay(triangulation, vornoiEdges);
             voronoiTimer.Stop();
+            Console.WriteLine($"voronoi:{voronoiTimer.ElapsedTicks * 1000000 / Stopwatch.Frequency}us {voronoiTimer.ElapsedMilliseconds}ms");
             DrawVoronoi(vornoiEdges);
 
             DrawPoints(points);
@@ -77,9 +100,9 @@ namespace DelaunayVoronoi
             var edges = new List<Edge>();
             foreach (var triangle in triangulation)
             {
-                edges.Add(new Edge(triangle.Vertices[0], triangle.Vertices[1]));
-                edges.Add(new Edge(triangle.Vertices[1], triangle.Vertices[2]));
-                edges.Add(new Edge(triangle.Vertices[2], triangle.Vertices[0]));
+                edges.Add(Edge.New(triangle.Vertices[0], triangle.Vertices[1]));
+                edges.Add(Edge.New(triangle.Vertices[1], triangle.Vertices[2]));
+                edges.Add(Edge.New(triangle.Vertices[2], triangle.Vertices[0]));
             }
 
             foreach (var edge in edges)
