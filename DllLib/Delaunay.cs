@@ -10,7 +10,7 @@ namespace DelaunayVoronoi
         {
             return BowyerWatson(points, 1.0, triangles);
         }
-        public bool BowyerWatson(List<Point> points, double margine, HashSet<Triangle> triangles)
+        public bool BowyerWatson(List<Point> points, double margin, HashSet<Triangle> triangles)
         {
             double minX = double.MaxValue;
             double minY = double.MaxValue;
@@ -34,10 +34,10 @@ namespace DelaunayVoronoi
                 else if (y > maxY)
                     maxY = y;
             }
-            minX = minX - margine;
-            maxX = maxX + margine;
-            minY = minY - margine;
-            maxY = maxY + margine;
+            minX = minX - margin;
+            maxX = maxX + margin;
+            minY = minY - margin;
+            maxY = maxY + margin;
 
             var supraTri = GenerateSupraTriangle(minX, minY, maxX, maxY);
 
